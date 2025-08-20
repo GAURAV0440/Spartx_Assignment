@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SOP Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Statement of Purpose (SOP) Generator</h1>
+        <form id="sopForm">
+            <label>Full Name:</label>
+            <input type="text" name="full_name" required>
+
+            <label>Age:</label>
+            <input type="number" name="age" required>
+
+            <label>Country Applying To:</label>
+            <input type="text" name="country" required>
+
+            <label>Desired Course:</label>
+            <input type="text" name="course" required>
+
+            <label>College/University:</label>
+            <input type="text" name="university" required>
+
+            <label>Educational Background:</label>
+            <textarea name="education" required></textarea>
+
+            <label>Future Goals:</label>
+            <textarea name="goals" required></textarea>
+
+            <button type="submit">Generate SOP</button>
+        </form>
+
+        <div id="outputContainer" style="display:none;">
+            <h2>Generated SOP</h2>
+            <pre id="sopOutput"></pre>
+            <button onclick="downloadTXT()">Download as .txt</button>
+            <button onclick="downloadPDF()">Download as PDF</button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById("sopForm");
+        const output = document.getElementById("sopOutput");
+        const container = document.getElementById("outputContainer");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            output.textContent = "Generating SOP...";
+            container.style.display = "block";
+
+            const formData = new FormData(form);
+            const response = await fetch("/generate-sop", {
+                method: "POST",
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.sop) {
+                output.textContent = result.sop;
+            } else {
+                output.textContent = result.error || "Error generating SOP. Please try again.";
+            }
+        });
+
+        function downloadTXT() {
+            const text = output.textContent;
+            const blob = new Blob([text], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "SOP.txt";
+            link.click();
+        }
+
+        function downloadPDF() {
+            const text = output.textContent;
+
+            fetch("/save-sop", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: new URLSearchParams({ content: text })
+            }).then(() => {
+                window.location.href = "/download-pdf";
+            });
+        }
+    </script>
+</body>
+</html>
