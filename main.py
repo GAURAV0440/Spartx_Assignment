@@ -75,11 +75,11 @@ Start directly and keep the writing compact but impressive.
         generated_text = response.choices[0].message.content.strip()
         SOP_STORAGE["latest"] = generated_text
 
-        print("✅ Groq response received.")
+        print(" Groq response received.")
         return {"sop": generated_text}
 
     except Exception as e:
-        print("❌ Error from Groq API:", str(e))
+        print(" Error from Groq API:", str(e))
         return {"error": "Failed to generate SOP. Please check your API key, model name, or usage limits."}
 
 
